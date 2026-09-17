@@ -1,0 +1,111 @@
+:root {
+  --text: #3f3a46;
+  --text-h: #16131a;
+  --bg: #f6f4f1;
+  --card: #ffffff;
+  --border: #e2ddd6;
+  --badge-bg: #e8f3ea;
+  --badge-text: #1f6b3a;
+  --note-bg: #fff6e8;
+  --note-text: #6b4e16;
+  --sans: system-ui, "Segoe UI", Roboto, sans-serif;
+
+  font: 16px/1.5 var(--sans);
+  color: var(--text);
+  background: var(--bg);
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+#root {
+  min-height: 100svh;
+}
+
+.app {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 40px 20px 64px;
+}
+
+.header {
+  margin-bottom: 32px;
+}
+
+.badge {
+  display: inline-block;
+  margin: 0 0 12px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--badge-bg);
+  color: var(--badge-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+h1 {
+  margin: 0 0 8px;
+  color: var(--text-h);
+  font-size: 2rem;
+  font-weight: 650;
+}
+
+.subtitle {
+  margin: 0;
+  max-width: 36rem;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+
+.card h2 {
+  margin: 0 0 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.value {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 650;
+  color: var(--text-h);
+}
+
+.backend-note {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  background: var(--note-bg);
+  color: var(--note-text);
+  font-weight: 600;
+}
+
+@media (max-width: 800px) {
+  .cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .cards {
+    grid-template-columns: 1fr;
+  }
+}

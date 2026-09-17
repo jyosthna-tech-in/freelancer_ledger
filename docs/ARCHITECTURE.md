@@ -6,7 +6,7 @@
 React/Vite -> SAM local API -> Lambda -> LocalStack DynamoDB/S3
 ```
 
-- **Frontend:** React + Vite + TypeScript in `frontend/`.
+- **Frontend:** React + Vite + TypeScript app in `frontend/` (scaffolded in Patch 2; no API calls yet).
 - **API:** AWS SAM CLI local API in `backend/`.
 - **Compute:** TypeScript Lambda handlers.
 - **Persistence:** LocalStack DynamoDB (source of truth) and LocalStack S3 (objects such as generated artifacts).
