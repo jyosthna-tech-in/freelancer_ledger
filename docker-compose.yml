@@ -1,0 +1,4 @@
+# Placeholder Compose file for Freelancer Ledger.
+# TODO: add LocalStack (DynamoDB/S3) and later OpenSearch services in a following patch.
+# Do not start real AWS or paid cloud services from this file.
+services: {}
