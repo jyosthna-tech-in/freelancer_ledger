@@ -13,6 +13,7 @@
   "type": "commonjs",
   "devDependencies": {
     "@types/aws-lambda": "^8.10.163",
+    "@types/node": "^26.6.1",
     "esbuild": "^0.28.2",
     "typescript": "^7.0.2"
   },
