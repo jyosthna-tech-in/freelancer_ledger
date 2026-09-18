@@ -11,9 +11,10 @@ Globals:
     Environment:
       Variables:
         CLIENTS_TABLE: freelancer-ledger-clients-local
+        INVOICES_TABLE: freelancer-ledger-invoices-local
 
 Resources:
-#-----DYNAMODB TABLES-----
+  # --- DYNAMODB TABLES ---
   ClientsTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -29,11 +30,24 @@ Resources:
           KeyType: HASH
         - AttributeName: clientId
           KeyType: RANGE
-  
-  
 
+  InvoicesTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: freelancer-ledger-invoices-local
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: invoiceId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: invoiceId
+          KeyType: RANGE
 
-#----LAMBDA FUNCTIONS----
+  # --- LAMBDA FUNCTIONS ---
   HealthFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -54,38 +68,80 @@ Resources:
           - health.ts
 
   ClientsFunction:
-      Type: AWS::Serverless::Function
-      Properties:
-        CodeUri: backend/
-        Handler: clients.handler
-        Policies:
-          - DynamoDBCrudPolicy:
-              TableName: !Ref ClientsTable
-        Events:
-          GetClients:
-            Type: Api
-            Properties:
-              Path: /clients
-              Method: get
-          CreateClient:
-            Type: Api
-            Properties:
-              Path: /clients
-              Method: post
-          GetClient:
-            Type: Api
-            Properties:
-              Path: /clients/{clientId}
-              Method: get
-          DeleteClient:
-            Type: Api
-            Properties:
-              Path: /clients/{clientId}
-              Method: delete
-      Metadata:
-        BuildMethod: esbuild
-        BuildProperties:
-          Minify: false
-          Target: es2020
-          EntryPoints:
-            - clients.ts
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/
+      Handler: clients.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ClientsTable
+      Events:
+        GetClients:
+          Type: Api
+          Properties:
+            Path: /clients
+            Method: get
+        CreateClient:
+          Type: Api
+          Properties:
+            Path: /clients
+            Method: post
+        GetClient:
+          Type: Api
+          Properties:
+            Path: /clients/{clientId}
+            Method: get
+        DeleteClient:
+          Type: Api
+          Properties:
+            Path: /clients/{clientId}
+            Method: delete
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: es2020
+        EntryPoints:
+          - clients.ts
+
+  InvoicesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/
+      Handler: invoices.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref InvoicesTable
+      Events:
+        CreateInvoice:
+          Type: Api
+          Properties:
+            Path: /clients/{clientId}/invoices
+            Method: post
+        GetClientInvoices:
+          Type: Api
+          Properties:
+            Path: /clients/{clientId}/invoices
+            Method: get
+        GetInvoice:
+          Type: Api
+          Properties:
+            Path: /invoices/{invoiceId}
+            Method: get
+        UpdateInvoice:
+          Type: Api
+          Properties:
+            Path: /invoices/{invoiceId}
+            Method: put
+        DeleteInvoice:
+          Type: Api
+          Properties:
+            Path: /invoices/{invoiceId}
+            Method: delete
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: es2020
+        EntryPoints:
+          - invoices.ts
