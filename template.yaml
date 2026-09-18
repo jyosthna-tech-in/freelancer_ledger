@@ -8,8 +8,32 @@ Globals:
     Runtime: nodejs18.x
     Architectures:
       - x86_64
+    Environment:
+      Variables:
+        CLIENTS_TABLE: freelancer-ledger-clients-local
 
 Resources:
+#-----DYNAMODB TABLES-----
+  ClientsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: freelancer-ledger-clients-local
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: clientId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: clientId
+          KeyType: RANGE
+  
+  
+
+
+#----LAMBDA FUNCTIONS----
   HealthFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -28,3 +52,40 @@ Resources:
         Target: es2020
         EntryPoints:
           - health.ts
+
+  ClientsFunction:
+      Type: AWS::Serverless::Function
+      Properties:
+        CodeUri: backend/
+        Handler: clients.handler
+        Policies:
+          - DynamoDBCrudPolicy:
+              TableName: !Ref ClientsTable
+        Events:
+          GetClients:
+            Type: Api
+            Properties:
+              Path: /clients
+              Method: get
+          CreateClient:
+            Type: Api
+            Properties:
+              Path: /clients
+              Method: post
+          GetClient:
+            Type: Api
+            Properties:
+              Path: /clients/{clientId}
+              Method: get
+          DeleteClient:
+            Type: Api
+            Properties:
+              Path: /clients/{clientId}
+              Method: delete
+      Metadata:
+        BuildMethod: esbuild
+        BuildProperties:
+          Minify: false
+          Target: es2020
+          EntryPoints:
+            - clients.ts
