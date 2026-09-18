@@ -1,4 +1,16 @@
-# Placeholder Compose file for Freelancer Ledger.
-# TODO: add LocalStack (DynamoDB/S3) and later OpenSearch services in a following patch.
-# Do not start real AWS or paid cloud services from this file.
-services: {}
+version: "3.9"
+
+services:
+  localstack:
+    container_name: freelancer-ledger-localstack
+    image: localstack/localstack:3.8
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=dynamodb,s3
+      - DEFAULT_REGION=us-east-1
+      - AWS_DEFAULT_REGION=us-east-1
+      - DEBUG=0
+    volumes:
+      - "./.localstack:/var/lib/localstack"
+      - "/var/run/docker.sock:/var/run/docker.sock"
