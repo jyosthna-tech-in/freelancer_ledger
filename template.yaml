@@ -12,6 +12,7 @@ Globals:
       Variables:
         CLIENTS_TABLE: freelancer-ledger-clients-local
         INVOICES_TABLE: freelancer-ledger-invoices-local
+        PAYMENTS_TABLE: freelancer-ledger-payments-local
 
 Resources:
   # --- DYNAMODB TABLES ---
@@ -45,6 +46,22 @@ Resources:
         - AttributeName: userId
           KeyType: HASH
         - AttributeName: invoiceId
+          KeyType: RANGE
+
+  PaymentsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: freelancer-ledger-payments-local
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: paymentId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: paymentId
           KeyType: RANGE
 
   # --- LAMBDA FUNCTIONS ---
@@ -145,3 +162,61 @@ Resources:
         Target: es2020
         EntryPoints:
           - invoices.ts
+
+  PaymentsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/
+      Handler: payments.handler
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref PaymentsTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref InvoicesTable
+      Events:
+        CreatePayment:
+          Type: Api
+          Properties:
+            Path: /invoices/{invoiceId}/payments
+            Method: post
+        GetPayments:
+          Type: Api
+          Properties:
+            Path: /invoices/{invoiceId}/payments
+            Method: get
+        DeletePayment:
+          Type: Api
+          Properties:
+            Path: /payments/{paymentId}
+            Method: delete
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: es2020
+        EntryPoints:
+          - payments.ts
+
+  LedgerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: backend/
+      Handler: ledger.handler
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref InvoicesTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref PaymentsTable
+      Events:
+        GetLedger:
+          Type: Api
+          Properties:
+            Path: /clients/{clientId}/ledger
+            Method: get
+    Metadata:
+      BuildMethod: esbuild
+      BuildProperties:
+        Minify: false
+        Target: es2020
+        EntryPoints:
+          - ledger.ts
